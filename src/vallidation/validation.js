@@ -31,115 +31,56 @@ const isNameValid = function (value) {
 
 
 // =================user validation===========================================
-const  userValidation = async function(req,res,next){
-    try{
-     
-    let data = req.body;
-    if (!isValidRequestBody(data)) {
-        return res
-            .status(400)
-            .send({ status: false, message: "user data is required to create a new user" });
-    }
-    let{ title, name, phone, email, password, address }=data
+const userValidation = async function (req, res, next) {
+    try {
 
-
-    if (!isValid(title)) {
-        return res
-            .status(400)
-            .send({ status: false, message: `title is required and should be valid format like: Mr/Mrs/Miss` });
-    }
-
-    if (!["Mr", "Mrs", "Miss"].includes(title.trim())) {
-        return res
-            .status(400)
-            .send({ status: false, message: `title must be provided from these values: Mr/Mrs/Miss`, });
-    }
-
-    if (!isValid(name) || !isNameValid(name)) {
-        return res
-            .status(400)
-            .send({ status: false, message: `name is required and should be in valid format ` });
-    }
-
-    if (!isValid(phone)) {
-        return res
-            .status(400)
-            .send({ status: false, message: "mobile number is required" });
-    }
-
-    if (!isValidPhone(phone)) {
-        return res
-            .status(400)
-            .send({ status: false, message: " please enter a valid 10 digit mobile number" });
-    }
-    const isPhoneUnique = await userModel.findOne({ phone });
-
-        if (isPhoneUnique) {
-            return res
-                .status(400)
-                .send({ status: false, message: `mobile number: ${phone} already exist` });
-        }
-    
-        if (!isValid(email)) {
-            return res
-                .status(400)
-                .send({ status: false, message: "email address is required" });
+        let data = req.body;
+        if (!isValidRequestBody(data)) {
+            return res.status(400).send({ status: false, message: "user data is required to create a new user" })
         }
 
-        if (!isValidEmail(email)) {
-            return res
-                .status(400)
-                .send({ status: false, message: " please enter a valid email address" });
-        }
+        let { title, name, phone, email, password, address } = data
 
-    const isEmailUnique = await userModel.findOne({ email });
+        if (!isValid(title)) { return res.status(400).send({ status: false, message: `title is required and should be valid format like: Mr/Mrs/Miss` }) }
 
-        if (isEmailUnique) {
-            return res
-                .status(400)
-                .send({ status: false, message: `email: ${email} already exist` });
-        }
-    
-        if (!isValid(password)) {
-            return res
-                .status(400)
-                .send({ status: false, message: "password is required" });
-        }
+        if (!["Mr", "Mrs", "Miss"].includes(title.trim())) { return res.status(400).send({ status: false, message: `title must be provided from these values: Mr/Mrs/Miss`, }) }
 
-        if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,15})/.test(password)) {
-            return res
-                .status(400)
-                .send({ status: false, message: "Password must contain 8 to 15 characters and have at least one number, one unique character, one Capital letter and one small letter " });
-        }
+        if (!isValid(name) || !isNameValid(name)) { return res.status(400).send({ status: false, message: `name is required and should be in valid format ` }) }
+
+        if (!isValid(phone)) { return res.status(400).send({ status: false, message: "mobile number is required" }) }
+
+        if (!isValidPhone(phone)) { return res.status(400).send({ status: false, message: " please enter a valid 10 digit mobile number" }) }
+
+        const isPhoneUnique = await userModel.findOne({ phone });
+
+        if (isPhoneUnique) { return res.status(400).send({ status: false, message: `mobile number: ${phone} already exist` }) }
+
+        if (!isValid(email)) { return res.status(400).send({ status: false, message: "email address is required" }) }
+
+        if (!isValidEmail(email)) { return res.status(400).send({ status: false, message: " please enter a valid email address" }) }
+
+        const isEmailUnique = await userModel.findOne({ email });
+
+        if (isEmailUnique) { return res.status(400).send({ status: false, message: `email: ${email} already exist` }) }
+
+        if (!isValid(password)) { return res.status(400).send({ status: false, message: "password is required" }) }
+
+        if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,15})/.test(password)) { return res.status(400).send({ status: false, message: "Password must contain 8 to 15 characters and have at least one number, one unique character, one Capital letter and one small letter " }) }
 
         if (address) {
 
-            if (!isValid(address.street)) {
-                return res
-                    .status(400)
-                    .send({ status: false, message: "invalid street" })
-            }
+            if (!isValid(address.street)) { return res.status(400).send({ status: false, message: "invalid street" }) }
 
-            if (!isValid(address.city) || !isNameValid(address.city)) {
-                return res
-                    .status(400)
-                    .send({ status: false, message: "invalid city" });
-            }
+            if (!isValid(address.city) || !isNameValid(address.city)) { return res.status(400).send({ status: false, message: "invalid city" }) }
 
-            if (! /^\+?([1-9]{1})\)?([0-9]{5})$/.test(address.pincode)) {
-                return res
-                    .status(400)
-                    .send({ status: false, message: "invalid pin" })
-            }
-
+            if (! /^\+?([1-9]{1})\)?([0-9]{5})$/.test(address.pincode)) { return res.status(400).send({ status: false, message: "invalid pin" }) }
         }
 
-      
         next()
-        }
-        catch (err) {
+    }
+    catch (err) {
         return res.status(500).send({ message: err.message })
-        }
+    }
 
 }
 module.exports.userValidation = userValidation

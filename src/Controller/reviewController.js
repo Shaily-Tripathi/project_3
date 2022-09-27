@@ -117,7 +117,6 @@ const updateReviews = async function (req, res) {
           
        if(rating)
        {
-        //if (!rating) { return res.status(400).send({ status: false, message: "please provide rating" }) }
        if (isValidNumber(rating)) { return res.status(400).send({ status: false, message: `rating should be number` }) }
        if (!(rating >= 1 && rating <= 5) ) {
            return res.status(400).send({ status: false, message: "give rating 1 to 5 " })
@@ -125,8 +124,6 @@ const updateReviews = async function (req, res) {
        temp.rating = rating
 
     }
-        // if (!(rating >= 1 && rating <= 5) ) {
-          //  return res.status(400).send({ status: false, message: ' please provide rating between 1 to 5' }) }
         
         let deletedBook = await BookModel.findOne({ _id: bookId, isDeleted: true })
 

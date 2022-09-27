@@ -217,7 +217,6 @@ const updateBooks = async function (req, res) {
 
     if(releasedAt)
     {
-     // if (!isValid(releasedAt)) { return res.status(400).send({ status: false, message: `releasedAt is required` }) }
 
     // checking date format
     if (!/^[0-9]{4}[-]{1}[0-9]{2}[-]{1}[0-9]{2}/.test(releasedAt)) {

@@ -41,6 +41,9 @@ const createBook = async function (req, res) {
 
     if (!isValidRequestBody(requestBody)) { return res.status(400).send({ status: false, message: "Book data is required to create a new Book" }) }
 
+    // authorization
+    if (decoded.userId != requestBody.userId) { return res.status(401).send({ status: false, message: `unauthorized access` }) }
+
     // using destructuring then validate the keys
     const { title, excerpt, userId, ISBN, category, subcategory, releasedAt } = requestBody;
 
@@ -62,8 +65,7 @@ const createBook = async function (req, res) {
 
     if (!isUserExistWithID) { return res.status(404).send({ status: false, message: `no user exist with ${userId}` }) }
 
-    // authorization
-    if (decoded.userId != requestBody.userId) { return res.status(401).send({ status: false, message: `unauthorized access` }) }
+    
 
     if (!isValid(ISBN)) { return res.status(400).send({ status: false, message: `ISBN is required` }) }
     // checking ISBN format

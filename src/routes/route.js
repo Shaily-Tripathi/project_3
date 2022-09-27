@@ -18,11 +18,6 @@ router.put("/books/:bookId/review/:reviewId",reviewController.updateReviews)
 router.delete("/books/:bookId/review/:reviewId", reviewController.delReview)
 
 //API for wrong route-Of-API
-router.all("/**", function (req, res) {
-    res.status(404).send({
-        status: false,
-        message: "The api you request is not available"
-    })
-})
+router.all("/**", function (req, res) {res.status(404).send({status: false, message: "The api you request is not available" })})
 
 module.exports = router;

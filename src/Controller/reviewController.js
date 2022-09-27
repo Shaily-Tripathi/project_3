@@ -44,12 +44,8 @@ const createReview = async function (req, res) {
       let { review, rating, reviewedBy, reviewedAt } = data
 
       if (isValidReqBody(data)) { return res.status(400).send({ status: false, message: "please provide data in request body" }) }
-      if(reviewedBy) {if (!isValidString(reviewedBy)) { return res.status(400).send({ status: false, message: "reviewedBy should be string." }) }}
 
-      let guestId = "Guest"
-      if (!isValidString(reviewedBy)) {
-          data['reviewedBy'] = guestId
-      }
+      if(reviewedBy) {if (!isValidString(reviewedBy)) { return res.status(400).send({ status: false, message: "reviewedBy should be string." }) }}
 
       if (!reviewedAt) { return res.status(400).send({ status: false, message: "please provide reviewedAt is required" }) }
       if (!/^[0-9]{4}[-]{1}[0-9]{2}[-]{1}[0-9]{2}/.test(reviewedAt)) {

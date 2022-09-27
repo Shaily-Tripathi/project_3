@@ -2,13 +2,6 @@ const mongoose = require('mongoose');
 const BookModel = require('../Model/bookModel')
 const reviewModel = require('../Model/reviewModel')
 const moment = require("moment")
-//const Validator = require('../vallidation/validation')
-
-// const isValid = function (value) {
-//     if (typeof (value) === undefined || typeof (value) === null) { return false }
-//     if (typeof (value) === "string" && (value).trim().length > 0) { return true }
-//     if (typeof (value) === "number" && (value).toString().length > 0) { return true }
-// }
 
 const isValidNumber = function(value)
 {
@@ -102,6 +95,7 @@ const updateReviews = async function (req, res) {
         let reviewId = req.params.reviewId
         let requestBody = req.body;
         const { review, rating, reviewedBy } = requestBody;
+        let temp ={}
 
         if (isValidReqBody(requestBody)) { return res.status(400).send({ status: false, message: "please provide data in request body" }) }
 
@@ -112,19 +106,25 @@ const updateReviews = async function (req, res) {
         if(review)
        {
            if (!isValidString(review)) { return res.status(400).send({ status: false, message: `review should be string` }) }
+           temp.review = review
         }
 
          if(reviewedBy)
         {
             if (!isValidString(reviewedBy)) { return res.status(400).send({ status: false, message: "reviewedBy should be string." }) }
+            temp.reviewedBy = reviewedBy
         }
           
-       
-       if (!rating) { return res.status(400).send({ status: false, message: "please provide rating" }) }
+       if(rating)
+       {
+        //if (!rating) { return res.status(400).send({ status: false, message: "please provide rating" }) }
        if (isValidNumber(rating)) { return res.status(400).send({ status: false, message: `rating should be number` }) }
        if (!(rating >= 1 && rating <= 5) ) {
            return res.status(400).send({ status: false, message: "give rating 1 to 5 " })
        }
+       temp.rating = rating
+
+    }
         // if (!(rating >= 1 && rating <= 5) ) {
           //  return res.status(400).send({ status: false, message: ' please provide rating between 1 to 5' }) }
         
@@ -144,9 +144,9 @@ const updateReviews = async function (req, res) {
 
             { _id: req.params.reviewId },
             {
-                review: review,
-                rating: rating,
-                reviewedBy: reviewedBy,
+                review: temp.review,
+                rating: temp.rating,
+                reviewedBy: temp.reviewedBy,
                 reviewedAt: moment().toISOString()
 
             },

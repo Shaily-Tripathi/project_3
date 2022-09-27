@@ -153,6 +153,7 @@ const getBooksById = async function (req, res) {
     let bookId = req.params.bookId
     if (!isValidIdType(bookId)) { return res.status(400).send({ status: false, message: "please give valid bookId" }) }
     let findBook = await BookModel.findOne({ _id: bookId, isDeleted: false }).lean()
+   // console.log(findBook)
     if (!findBook) { return res.status(404).send({ status: false, message: "No book found" }) }
 
     const reviewData = await reviewModel.find({ bookId: findBook._id, isDeleted: false }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
@@ -181,12 +182,16 @@ const updateBooks = async function (req, res) {
 
     let { title, excerpt, releasedAt, ISBN } = requestBody
 
+    let temp = {}
+
     const isTitleUnique = await BookModel.findOne({ title: title, isDeleted: false })
 
     if (title) {
       if (!isValid(title)) { return res.status(400).send({ status: false, message: `title is required and should be in valid format` }) }
 
       if (isTitleUnique) { return res.status(400).send({ status: false, message: `title already exist` }) }
+
+      temp.title = title
     }
 
     if (ISBN) {
@@ -200,10 +205,38 @@ const updateBooks = async function (req, res) {
       const isUniqueISBN = await BookModel.findOne({ ISBN: ISBN, isDeleted: false })
 
       if (isUniqueISBN) { return res.status(400).send({ status: false, message: "ISBN already exist" }) }
+
+      temp.ISBN = ISBN
     }
 
+    if(excerpt)
+    {
+      if (!isValid(excerpt)) { return res.status(400).send({ status: false, message: "excerpt should be string." }) }
+            temp.excerpt = excerpt
+    }
 
-    const bookUpdated = await BookModel.findOneAndUpdate({ _id: bookId, isDeleted: false }, { $set: { title: title, excerpt: excerpt, releasedAt: Date.now(), ISBN: ISBN } }, { new: true })
+    if(releasedAt)
+    {
+     // if (!isValid(releasedAt)) { return res.status(400).send({ status: false, message: `releasedAt is required` }) }
+
+    // checking date format
+    if (!/^[0-9]{4}[-]{1}[0-9]{2}[-]{1}[0-9]{2}/.test(releasedAt)) {
+      return res.status(400).send({ status: false, message: `released date format should be YYYY-MM-DD` })
+    }
+
+    // validating the date
+    if (moment(releasedAt).isValid() == false) { return res.status(400).send({ status: false, message: "enter a valid released date" }) }
+    
+    temp.releasedAt = releasedAt
+    }
+
+    const bookUpdated = await BookModel.findOneAndUpdate({ _id: bookId, isDeleted: false }, { 
+      $set: { title: temp.title, 
+        excerpt: temp.excerpt, 
+        releasedAt: temp.releasedAt, 
+        ISBN: temp.ISBN } }, 
+        { new: true })
+
     if (!bookUpdated) return res.status(400).send({ status: false, message: "books are already deleted" })
     return res.status(200).send({ status: true, data: bookUpdated })
   }
